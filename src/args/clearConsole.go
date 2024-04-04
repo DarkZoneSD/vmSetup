@@ -8,7 +8,7 @@ import (
 
 var clear map[string]func() //create a map for storing clear funcs
 
-func init() {
+func Init() {
 	clear = make(map[string]func()) //Initialize it
 	clear["linux"] = func() {
 		cmd := exec.Command("clear") //Linux example, its tested
