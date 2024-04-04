@@ -8,17 +8,16 @@ import (
 	"strings"
 )
 
-var configurationBlueprint string = `HostName: "REPLACE_HOST_NAME"
-ipaddress: "REPLACE_IP_ADDRESS"
-gateway: "REPLACE_GATEWAY_ADDRESS"
-dns:
-  - "REPLACE_DNS_ADDRESS"
-`
+var configurationBlueprint string = `conf:
+   hostname: REPLACE_HOST_NAME
+   ipaddress: REPLACE_IP_ADDRESS
+   gateway: REPLACE_GATEWAY_ADDRESS
+   dns: REPLACE_DNS_ADDRESS`
 
 func HandleArgs(args []string) {
 	//Creates temporary file in which the args get saved.
 	filepath := "/tmp"
-	filename := "vmSetupConf.*.yml"
+	filename := "vmSetupConf.*.yaml"
 
 	file, err := ioutil.TempFile(filepath, filename)
 	if err != nil {
@@ -55,12 +54,20 @@ func HandleArgs(args []string) {
 		}
 	}
 	fmt.Println("Saved new configuration to file:", file.Name())
-	fmt.Println(configurationBlueprint)
+	// fmt.Println(configurationBlueprint)
 	err = ioutil.WriteFile(file.Name(), []byte(configurationBlueprint), 0644)
 	if err != nil {
 		fmt.Println("Error writing to file:", err)
 		return
 	}
+
+	var c conf
+	ipAddress, err := c.getIPAddress(file.Name())
+	if err != nil {
+		fmt.Println("Error:", err)
+		return
+	}
+	fmt.Println("IP Address:", ipAddress)
 
 	//Removes the temporary configuration file
 	defer os.Remove(file.Name())

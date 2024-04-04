@@ -1,14 +1,15 @@
 package args
 
 import (
+	"fmt"
+
 	"github.com/3th1nk/cidr"
 )
 
-func checkIpAddress(newIP string) string {
-	ip, err := cidr.Parse(newIP)
+func checkGateway(newIP string, newGateway string) {
+	ip, err := cidr.Parse(newGateway)
 	if err != nil {
-		return err.Error()
+		fmt.Println(err.Error())
 	}
-	//var netadddress = ip.Network().String()
-	return ip.Network().String()
+	fmt.Println(ip.Network().String())
 }
