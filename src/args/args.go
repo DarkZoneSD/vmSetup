@@ -6,13 +6,25 @@ import (
 	"log"
 	"os"
 	"strings"
+
+	"github.com/DarkZoneSD/vmSetup/src/network"
 )
 
-var configurationBlueprint string = `conf:
-   hostname: REPLACE_HOST_NAME
-   ipaddress: REPLACE_IP_ADDRESS
-   gateway: REPLACE_GATEWAY_ADDRESS
-   dns: REPLACE_DNS_ADDRESS`
+var configurationBlueprint string = `hostname: REPLACE_HOST_NAME
+ipaddress: REPLACE_IP_ADDRESS
+gateway: REPLACE_GATEWAY_ADDRESS
+dns: REPLACE_DNS_ADDRESS`
+
+var flagToPlaceholder = map[string]string{
+	"-i":          "REPLACE_IP_ADDRESS",
+	"--ipaddress": "REPLACE_IP_ADDRESS",
+	"-g":          "REPLACE_GATEWAY_ADDRESS",
+	"--gateway":   "REPLACE_GATEWAY_ADDRESS",
+	"-d":          "REPLACE_DNS_ADDRESS",
+	"--dns":       "REPLACE_DNS_ADDRESS",
+	"-n":          "REPLACE_HOST_NAME",
+	"--name":      "REPLACE_HOST_NAME",
+}
 
 func HandleArgs(args []string) {
 	//Creates temporary file in which the args get saved.
@@ -25,34 +37,20 @@ func HandleArgs(args []string) {
 	}
 
 	for i := range args {
-		switch args[i] {
-		case "-i":
-			configurationBlueprint = strings.Replace(configurationBlueprint, "REPLACE_IP_ADDRESS", args[i+1], -1)
-			fmt.Println(args[i+1])
-		case "--ipaddress":
-			configurationBlueprint = strings.Replace(configurationBlueprint, "REPLACE_IP_ADDRESS", args[i+1], -1)
-		case "-g":
-			configurationBlueprint = strings.Replace(configurationBlueprint, "REPLACE_GATEWAY_ADDRESS", args[i+1], -1)
-		case "--gateway":
-			configurationBlueprint = strings.Replace(configurationBlueprint, "REPLACE_GATEWAY_ADDRESS", args[i+1], -1)
-		case "-d":
-			configurationBlueprint = strings.Replace(configurationBlueprint, "REPLACE_DNS_ADDRESS", args[i+1], -1)
-		case "--dns":
-			configurationBlueprint = strings.Replace(configurationBlueprint, "REPLACE_DNS_ADDRESS", args[i+1], -1)
-		case "-n":
-			configurationBlueprint = strings.Replace(configurationBlueprint, "REPLACE_HOST_NAME", args[i+1], -1)
-		case "--name":
-			configurationBlueprint = strings.Replace(configurationBlueprint, "REPLACE_HOST_NAME", args[i+1], -1)
-		case "-h":
+		if replacement, ok := flagToPlaceholder[args[i]]; ok {
+			if i+1 < len(args) {
+				configurationBlueprint = strings.Replace(configurationBlueprint, replacement, args[i+1], -1)
+			} else {
+				fmt.Println("Error: Missing value for", args[i])
+				return
+			}
+		} else if args[i] == "-h" || args[i] == "--help" {
 			DisplayHelpText()
-		case "--help":
-			DisplayHelpText()
-		case "-c":
-			interactiveConsole()
-		case "--console":
+		} else if args[i] == "-c" || args[i] == "--console" {
 			interactiveConsole()
 		}
 	}
+
 	fmt.Println("Saved new configuration to file:", file.Name())
 	// fmt.Println(configurationBlueprint)
 	err = ioutil.WriteFile(file.Name(), []byte(configurationBlueprint), 0644)
@@ -61,16 +59,34 @@ func HandleArgs(args []string) {
 		return
 	}
 
-	var c conf
+	c := &conf{}
 	ipAddress, err := c.getIPAddress(file.Name())
 	if err != nil {
-		fmt.Println("Error:", err)
+		fmt.Println("Error reading IP address:", err)
 		return
 	}
 	fmt.Println("IP Address:", ipAddress)
-
+	gateway, err := c.getGateway(file.Name())
+	if err != nil {
+		fmt.Println("Error reading Gateway:", err)
+		return
+	}
+	fmt.Println("Gateway:", gateway)
+	dns, err := c.getDns(file.Name())
+	if err != nil {
+		fmt.Println("Error reading Dns:", err)
+		return
+	}
+	fmt.Println("Dns:", dns)
+	hostname, err := c.getHostname(file.Name())
+	if err != nil {
+		fmt.Println("Error reading Hostname:", err)
+		return
+	}
+	fmt.Println("Hostname:", hostname)
 	//Removes the temporary configuration file
 	defer os.Remove(file.Name())
+	network.CheckGateway(ipAddress, gateway)
 }
 
 func DisplayHelpText() {

@@ -1,4 +1,4 @@
-module vmSetup
+module github.com/DarkZoneSD/vmSetup
 
 go 1.18
 

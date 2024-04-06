@@ -15,7 +15,6 @@ type conf struct {
 }
 
 func (c *conf) getIPAddress(filepath string) (string, error) {
-	fmt.Println("Reading from file: ", filepath)
 	yamlFile, err := ioutil.ReadFile(filepath)
 	if err != nil {
 		return "", fmt.Errorf("yamlFile.Get err: %v", err)
@@ -25,4 +24,39 @@ func (c *conf) getIPAddress(filepath string) (string, error) {
 		return "", fmt.Errorf("Unmarshal: %v", err)
 	}
 	return c.IPAddress, nil
+}
+
+func (c *conf) getGateway(filepath string) (string, error) {
+	yamlFile, err := ioutil.ReadFile(filepath)
+	if err != nil {
+		return "", fmt.Errorf("yamlFile.Get err: %v", err)
+	}
+	err = yaml.Unmarshal(yamlFile, c)
+	if err != nil {
+		return "", fmt.Errorf("Unmarshal: %v", err)
+	}
+	return c.Gateway, nil
+}
+
+func (c *conf) getDns(filepath string) (string, error) {
+	yamlFile, err := ioutil.ReadFile(filepath)
+	if err != nil {
+		return "", fmt.Errorf("yamlFile.Get err: %v", err)
+	}
+	err = yaml.Unmarshal(yamlFile, c)
+	if err != nil {
+		return "", fmt.Errorf("Unmarshal: %v", err)
+	}
+	return c.Dns, nil
+}
+func (c *conf) getHostname(filepath string) (string, error) {
+	yamlFile, err := ioutil.ReadFile(filepath)
+	if err != nil {
+		return "", fmt.Errorf("yamlFile.Get err: %v", err)
+	}
+	err = yaml.Unmarshal(yamlFile, c)
+	if err != nil {
+		return "", fmt.Errorf("Unmarshal: %v", err)
+	}
+	return c.HostName, nil
 }

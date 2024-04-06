@@ -2,7 +2,8 @@ package main
 
 import (
 	"os"
-	"vmSetup/src/args"
+
+	"github.com/DarkZoneSD/vmSetup/src/args"
 )
 
 func main() {
