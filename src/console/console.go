@@ -1,4 +1,4 @@
-package args
+package console
 
 import (
 	"bufio"
@@ -6,9 +6,11 @@ import (
 	"net"
 	"os"
 	"strings"
+
+	"github.com/DarkZoneSD/vmSetup/src/misc"
 )
 
-func interactiveConsole() {
+func InteractiveConsole() {
 	printConsoleHelpText()
 
 	reader := bufio.NewReader(os.Stdin)
@@ -26,7 +28,7 @@ func interactiveConsole() {
 		} else if strings.Compare("help", text) == 0 || strings.Compare("h", text) == 0 {
 			printConsoleHelpText()
 		} else if strings.Compare("clear", text) == 0 || strings.Compare("c", text) == 0 {
-			CallClear()
+			misc.CallClear()
 		} else {
 			fmt.Println("No command found for the input.")
 		}

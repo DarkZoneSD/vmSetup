@@ -1,4 +1,4 @@
-package args
+package misc
 
 import (
 	"os"

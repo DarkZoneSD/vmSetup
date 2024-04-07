@@ -1,12 +1,14 @@
 package args
 
 import (
+	"bufio"
 	"fmt"
 	"io/ioutil"
 	"log"
 	"os"
 	"strings"
 
+	"github.com/DarkZoneSD/vmSetup/src/console"
 	"github.com/DarkZoneSD/vmSetup/src/network"
 )
 
@@ -27,7 +29,6 @@ var flagToPlaceholder = map[string]string{
 }
 
 func HandleArgs(args []string) {
-	//Creates temporary file in which the args get saved.
 	filepath := "/tmp"
 	filename := "vmSetupConf.*.yaml"
 
@@ -47,12 +48,10 @@ func HandleArgs(args []string) {
 		} else if args[i] == "-h" || args[i] == "--help" {
 			DisplayHelpText()
 		} else if args[i] == "-c" || args[i] == "--console" {
-			interactiveConsole()
+			console.InteractiveConsole()
 		}
 	}
 
-	fmt.Println("Saved new configuration to file:", file.Name())
-	// fmt.Println(configurationBlueprint)
 	err = ioutil.WriteFile(file.Name(), []byte(configurationBlueprint), 0644)
 	if err != nil {
 		fmt.Println("Error writing to file:", err)
@@ -71,22 +70,24 @@ func HandleArgs(args []string) {
 		return
 	}
 
-	//Removes the temporary configuration file
 	defer os.Remove(file.Name())
 	if network.IsIpInsideNetwork(ipAddress, gateway) {
 		fmt.Println("Gateway is reachable.")
 	} else {
-		fmt.Println("Gateway isn't reachable")
+		fmt.Println("The provided gateway isn't reachable within your specified subnet!\nDo you wish to continue anyways? [y/N]")
+		reader := bufio.NewReader(os.Stdin)
+		text, _ := reader.ReadString('\n')
+		text = strings.Replace(text, "\n", "", -1)
+
+		if strings.Compare("y", text) == 0 || strings.Compare("Y", text) == 0 {
+			fmt.Println("Continuing..")
+		} else {
+			fmt.Println("Cancelling..")
+			os.Exit(0)
+		}
 	}
 }
 
-// Displays the possible arguments when calling this program
-//
-//  -n NewHostName         New Hostname of the Machine
-//  -i IPAddress           New IPAddress of the Machine
-//  -g              Gateway of the new Network
-//  -d DNS                 Nameservers of the new Network
-//  -c Console 		Starts an interactive console
 func DisplayHelpText() {
 	fmt.Println(`
 	-n NewHostName         New Hostname of the Machine
