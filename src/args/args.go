@@ -6,6 +6,8 @@ import (
 	"log"
 	"os"
 	"strings"
+
+	"github.com/DarkZoneSD/vmSetup/src/network"
 )
 
 var configurationBlueprint string = `hostname: REPLACE_HOST_NAME
@@ -63,28 +65,15 @@ func HandleArgs(args []string) {
 		fmt.Println("Error reading IP address:", err)
 		return
 	}
-	fmt.Println("IP Address:", ipAddress)
 	gateway, err := c.getGateway(file.Name())
 	if err != nil {
 		fmt.Println("Error reading Gateway:", err)
 		return
 	}
-	fmt.Println("Gateway:", gateway)
-	dns, err := c.getDns(file.Name())
-	if err != nil {
-		fmt.Println("Error reading Dns:", err)
-		return
-	}
-	fmt.Println("Dns:", dns)
-	hostname, err := c.getHostname(file.Name())
-	if err != nil {
-		fmt.Println("Error reading Hostname:", err)
-		return
-	}
-	fmt.Println("Hostname:", hostname)
+
 	//Removes the temporary configuration file
 	defer os.Remove(file.Name())
-	network.isGatewayInsideTheNetwork(ipAddress, gateway)
+	network.IsGatewayInsideTheNetwork(ipAddress, gateway)
 }
 
 // Displays the possible arguments when calling this program
