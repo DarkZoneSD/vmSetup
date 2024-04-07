@@ -73,14 +73,18 @@ func HandleArgs(args []string) {
 
 	//Removes the temporary configuration file
 	defer os.Remove(file.Name())
-	network.IsGatewayInsideTheNetwork(ipAddress, gateway)
+	if network.IsIpInsideNetwork(ipAddress, gateway) {
+		fmt.Println("Gateway is reachable.")
+	} else {
+		fmt.Println("Gateway isn't reachable")
+	}
 }
 
 // Displays the possible arguments when calling this program
 //
 //  -n NewHostName         New Hostname of the Machine
 //  -i IPAddress           New IPAddress of the Machine
-//  -g Gateway             Gateway of the new Network
+//  -g              Gateway of the new Network
 //  -d DNS                 Nameservers of the new Network
 //  -c Console 		Starts an interactive console
 func DisplayHelpText() {

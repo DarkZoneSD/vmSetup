@@ -19,7 +19,7 @@ func CheckGateway(newIP string, newGateway string) {
 	}
 	fmt.Println(ip.Network().String())
 }
-func IsGatewayInsideTheNetwork(newIP string, newGateway string) bool {
+func IsIpInsideNetwork(newIP string, newGateway string) bool {
 	subnetBits, err := strconv.Atoi(strings.Split(newIP, "/")[1])
 	if err != nil {
 		panic(err)
@@ -28,37 +28,41 @@ func IsGatewayInsideTheNetwork(newIP string, newGateway string) bool {
 	gatewayBitArray := returnOctettBits(newGateway)
 
 	for i := 0; i < subnetBits; i++ {
-
+		if ipBitArray[i] != gatewayBitArray[i] {
+			return false
+		}
 	}
 
 	return true
 }
 
-func returnOctettBits(ip string) [4]string {
-	var result [4]string
-	for i := 0; i < len(result); i++ {
-		sTemp, err := strconv.Atoi(strings.Split(ip, ".")[i])
+func returnOctettBits(ip string) [32]int {
+	var result [32]int
+	binaryStr := ""
+	for _, octet := range strings.Split(ip, ".") {
+		sTemp, err := strconv.Atoi(octet)
 		if err != nil {
 			fmt.Println("Error:", err)
+			return result // Return the result array as is if there's an error
 		}
-		binaryStr := fmt.Sprintf("%08b", sTemp)
-		result[i] = binaryStr
+		// Convert the octet to binary and append to the binary string
+		binaryStr += fmt.Sprintf("%08b", sTemp)
 	}
+
+	// Ensure the binary string is exactly 32 characters long
+	if len(binaryStr) != 32 {
+		fmt.Println("Error: IP address does not represent a 32-bit binary number")
+		return result // Return the result array as is if the length is incorrect
+	}
+
+	// Convert each character in the binary string to an integer and store in the result array
+	for i, bit := range binaryStr {
+		if bit == '1' {
+			result[i] = 1
+		} else {
+			result[i] = 0
+		}
+	}
+
 	return result
-}
-
-func convCidrToBitArray(cidr int) []string {
-	var sTempArray []string
-	var tempString string
-
-	for i := 0; i < cidr/8; i++ {
-		sTempArray = append(sTempArray, "11111111")
-	}
-	for i := 0; i < cidr%8; i++ {
-		tempString += "1"
-	}
-
-	sTempArray = append(sTempArray, tempString)
-
-	return sTempArray
 }
