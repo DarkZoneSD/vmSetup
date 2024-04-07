@@ -6,8 +6,6 @@ import (
 	"log"
 	"os"
 	"strings"
-
-	"github.com/DarkZoneSD/vmSetup/src/network"
 )
 
 var configurationBlueprint string = `hostname: REPLACE_HOST_NAME
@@ -86,9 +84,16 @@ func HandleArgs(args []string) {
 	fmt.Println("Hostname:", hostname)
 	//Removes the temporary configuration file
 	defer os.Remove(file.Name())
-	network.CheckGateway(ipAddress, gateway)
+	network.isGatewayInsideTheNetwork(ipAddress, gateway)
 }
 
+// Displays the possible arguments when calling this program
+//
+//  -n NewHostName         New Hostname of the Machine
+//  -i IPAddress           New IPAddress of the Machine
+//  -g Gateway             Gateway of the new Network
+//  -d DNS                 Nameservers of the new Network
+//  -c Console 		Starts an interactive console
 func DisplayHelpText() {
 	fmt.Println(`
 	-n NewHostName         New Hostname of the Machine

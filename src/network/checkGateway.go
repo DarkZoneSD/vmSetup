@@ -2,6 +2,7 @@ package network
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/3th1nk/cidr"
 )
@@ -17,6 +18,9 @@ func CheckGateway(newIP string, newGateway string) {
 	}
 	fmt.Println(ip.Network().String())
 }
-func isGatewayInsideTheNetwork(newIP string, newGateway string) bool {
+func IsGatewayInsideTheNetwork(newIP string, newGateway string) bool {
+	countBits := strings.Split(newIP, "/")[1]
+	fmt.Println(countBits)
+	fmt.Println(newGateway)
 	return true
 }
